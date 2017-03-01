@@ -1,0 +1,46 @@
+{
+  "exports": {
+    "config": "framework.common",
+    "locale": "framework.common"
+  },
+  "locales": {
+    "moment": {
+      "en": [ "@require:moment <- moment/locale/en-gb.js" ],
+      "ru": [ "@require:moment <- moment/locale/ru.js" ]
+    }
+  },
+  "requires": {
+    "jq": "jquery",
+    "React": "react",
+    "ReactDOM": "react-dom",
+    "cookies": "js-cookie",
+    "ReactRouter": "react-router",
+    "request": "browser-request",
+    "QS": "query-string"
+  },
+  "packages": {
+    "vendors": [
+      "libs/DI.coffee",
+      "@require:lodash",
+      "@require:jq",
+      "@require:cookies",
+      "@require:promise",
+      "@require:request",
+      "@require:QS",
+      "@require:React",
+      "@require:ReactDOM",
+      "@require:ReactRouter",
+      "@locale:moment"
+    ],
+    "modules": [
+      "@module:framework.config",
+      "@module:framework.debug",
+      "@module:framework.locale",
+      "@module:framework.libs",
+      "@module:framework.common",
+      "@module:framework.unit",
+      "@module:framework.entity",
+      "@module:framework.component"
+    ]
+  }
+}
