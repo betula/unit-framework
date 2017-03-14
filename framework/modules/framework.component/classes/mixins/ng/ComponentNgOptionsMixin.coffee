@@ -1,13 +1,12 @@
 # @di
-di.provider 'ComponentOptionsMixin', (MixinAbstract) ->
+di.provider 'ComponentNgOptionsMixin', (MixinAbstract) ->
 
-  class ComponentOptionsMixin extends MixinAbstract
+  class ComponentNgOptionsMixin extends MixinAbstract
 
-    @restrict: (@_restrict) ->
-      @_restrict or= 'E'
+    @restrict: () ->
+      console.error 'Restrict options does not supported. Use @element or @directive annotations.'
 
-    @template: (@_template) ->
-    @templateUrl: (@_templateUrl) ->
+    @template: (@_templateUrl) ->
 
     @scope: (value) ->
       if value is 'isolate' or value?.constructor is Object

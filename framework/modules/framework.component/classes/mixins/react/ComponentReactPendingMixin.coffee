@@ -1,18 +1,17 @@
 # @di
-di.provider 'ComponentPendingMixin', (MixinAbstract, UnitInitMixin, ComponentDirectiveMixin, UnitActivityWatcher, ComponentInputMixin, ComponentExportMixin) ->
+di.provider 'ComponentReactPendingMixin', (MixinAbstract, UnitInitMixin, UnitActivityWatcher, ComponentReactInputMixin) ->
 
   capitalize = (str)->
     return str.charAt(0).toUpperCase() + str.slice(1)
       
-  class ComponentPendingMixin extends MixinAbstract 
+  class ComponentReactPendingMixin extends MixinAbstract
 
-    @dependencies ComponentDirectiveMixin, UnitInitMixin, ComponentInputMixin, ComponentExportMixin
+    @dependencies UnitInitMixin, ComponentReactInputMixin
 
     @Defaults =
       PendingKey: 'main'
       PendingIn: '@pendingIn'
       PendingOut: '@pendingOut'
-      PendingExport: true
 
     @pending: (values...)->
       unless @hasOwnProperty '_pendingConfig'
@@ -33,9 +32,8 @@ di.provider 'ComponentPendingMixin', (MixinAbstract, UnitInitMixin, ComponentDir
           @_pendingConfig[key] =
             in: gatherDependencies dependencies.in
             out: gatherDependencies dependencies.out
-            export: if dependencies.export? then Boolean dependencies.export else @Defaults.PendingExport
 
-      registerPending @Defaults.PendingKey, { in: @Defaults.PendingIn, out: @Defaults.PendingOut, export: @Defaults.PendingExport }
+      registerPending @Defaults.PendingKey, { in: @Defaults.PendingIn, out: @Defaults.PendingOut }
       if values.length
         for value in values when value?
           if typeof value is 'string'
@@ -89,7 +87,6 @@ di.provider 'ComponentPendingMixin', (MixinAbstract, UnitInitMixin, ComponentDir
         constructPending(key, value)
 
       @input pendingInput
-
       @constraints pendingConstraints
 
     @_getPendingConfig: ->
@@ -109,11 +106,8 @@ di.provider 'ComponentPendingMixin', (MixinAbstract, UnitInitMixin, ComponentDir
           value: config
       return @prototype._pendingConfigCache
 
-    _hasPending: ->
-      return Object.keys(@constructor._getPendingConfig()).length
-
     _preInit: (args...) ->
-      ComponentPendingMixin.super @, '_preInit', args...
+      ComponentReactPendingMixin.super @, '_preInit', args...
 
       @__pendingStates = {}
       for key of @constructor._getPendingConfig()
@@ -128,21 +122,6 @@ di.provider 'ComponentPendingMixin', (MixinAbstract, UnitInitMixin, ComponentDir
           for keyIn in @constructor._getPendingConfig()[_key].in when keyIn.charAt(0) isnt '@'
             if keyIn is key
               @_getPending(_key).add @_getPending(key)
-
-    _getExport: ->
-      config = ComponentPendingMixin.super @, '_getExport'
-
-      if @_hasPending()
-        _scope = @constructor._scope
-        if _scope or typeof _scope is 'undefined'
-          pendingConfig = @constructor._getPendingConfig()
-          if pendingConfig[@constructor.Defaults.PendingKey].export
-            config[ 'pending' ] = '='
-          for key of pendingConfig
-            if pendingConfig[key].export
-              config[ 'pending' + capitalize key ] = '='
-
-      return config
 
     _getPending: (key = @constructor.Defaults.PendingKey)->
       return @__pendingStates[ key ]

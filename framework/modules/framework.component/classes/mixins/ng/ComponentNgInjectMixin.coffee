@@ -1,7 +1,7 @@
 # @di
-di.provider 'ComponentInjectMixin', (MixinAbstract) ->
+di.provider 'ComponentNgInjectMixin', (MixinAbstract) ->
 
-  class ComponentInjectMixin extends MixinAbstract
+  class ComponentNgInjectMixin extends MixinAbstract
 
     @_getInject: -> [
       '$scope'

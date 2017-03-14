@@ -1,14 +1,14 @@
 # @di
-di.provider 'ComponentDirectiveMixin', (debug, MixinAbstract, ComponentInjectMixin, UnitInitMixin) ->
-  log = debug.ns 'ComponentDirectiveMixin'
+di.provider 'ComponentNgDescriptorMixin', (debug, MixinAbstract, ComponentNgInjectMixin, UnitInitMixin) ->
+  log = debug.ns 'ComponentNgDescriptorMixin'
 
-  class ComponentDirectiveMixin extends MixinAbstract
+  class ComponentNgDescriptorMixin extends MixinAbstract
 
-    @dependencies ComponentInjectMixin, UnitInitMixin
+    @dependencies ComponentNgInjectMixin, UnitInitMixin
 
     @getDirectiveDescriptor: ->
       descriptor = {}
-      descriptor.restrict = @_restrict
+      descriptor.restrict = @_restrict or 'A'
       descriptor.template = @_template if @_template?
       descriptor.templateUrl = @_templateUrl if @_templateUrl?
       descriptor.compile = @_compile.bind @
@@ -27,6 +27,11 @@ di.provider 'ComponentDirectiveMixin', (debug, MixinAbstract, ComponentInjectMix
 
       return descriptor
 
+    @getElementDescriptor: ->
+      descriptor = @getDirectiveDescriptor()
+      descriptor.restrict = 'E'
+      return descriptor
+
     @_compile: ->
       pre: @_preLink.bind @
       post: @_postLink.bind @
@@ -38,11 +43,11 @@ di.provider 'ComponentDirectiveMixin', (debug, MixinAbstract, ComponentInjectMix
       instance._postLink()
 
     _preLink: ->
-      try
-        @_preInit()
-        @_init()
-        @_afterInit()
-      catch e
-        log.error e
+      @_startInitCycle()
 
     _postLink: ->
+
+    _startInitCycle: ->
+      @_preInit()
+      @_init()
+      @_afterInit()

@@ -1,10 +1,10 @@
 # @di
-di.provider 'ComponentInputMixin', (MixinAbstract, debug, ComponentInjectMixin, UnitInitMixin, UnitApplyMixin, ComponentDirectiveMixin, UnitMixin) ->
-  log = debug.ns 'ComponentInputMixin'
+di.provider 'ComponentReactInputMixin', (MixinAbstract, debug, UnitInitMixin, UnitMixin) ->
+  log = debug.ns 'ComponentReactInputMixin'
 
-  class ComponentInputMixin extends MixinAbstract
+  class ComponentReactInputMixin extends MixinAbstract
 
-    @dependencies ComponentInjectMixin, UnitInitMixin, UnitApplyMixin, ComponentDirectiveMixin
+    @dependencies UnitInitMixin
 
     @input: (values...) ->
       for value in values when value?
@@ -61,10 +61,10 @@ di.provider 'ComponentInputMixin', (MixinAbstract, debug, ComponentInjectMixin, 
 
 
     _init: ->
-      ComponentInputMixin.super @, '_init'
+      ComponentReactInputMixin.super @, '_init'
 
-      scope = @_getScope()
-      attrs = @_getAttrs()
+      context = @_getReactContext()
+      props = context.props
 
       constraints = @constructor._getConstraints() or {}
 
@@ -75,39 +75,17 @@ di.provider 'ComponentInputMixin', (MixinAbstract, debug, ComponentInjectMixin, 
         key = null
         for _config in config
           _config = String _config
-          unless (method = _config[ 0 ]) in [ '=', '@', '&' ]
+          unless (method = _config[ 0 ]) in [ '=' ]
             method = null
             log.warn "Unsupported input method `#{_config[ 0 ]}` for `#{name}` in `#{@constructor.name}` component"
             break
           key = _config[ 1.. ] or name
-          if attrs[ key ]?
+          if props[ key ]?
             break
 
         continue unless method
 
-        switch method
-          when '='
-            value = null
-            if @constructor._scope or typeof @constructor._scope is 'undefined'
-              value = scope.$parent.$eval attrs[ key ] if attrs[ key ]
-            else
-              value = scope.$eval attrs[ key ] if attrs[ key ]
-          when '@'
-            value = attrs[ key ]
-          when '&'
-            value = ->
-            if attrs[ key ]
-              expr = attrs[ key ]
-
-              do (expr) =>
-                if @constructor._scope or typeof @constructor._scope is 'undefined'
-                    value = (locals) ->
-                      scope.$parent.$eval expr, locals
-                else
-                  value = (locals) ->
-                    scope.$eval expr, locals
-
-
+        value = props[ key ]
 
         pass = true
         if constraints.hasOwnProperty name

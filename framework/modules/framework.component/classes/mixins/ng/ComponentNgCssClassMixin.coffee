@@ -1,16 +1,16 @@
 # @di
-di.provider 'ComponentCssClassMixin', (MixinAbstract, ComponentDirectiveMixin, ComponentInjectMixin) ->
+di.provider 'ComponentNgCssClassMixin', (MixinAbstract, ComponentNgDescriptorMixin, ComponentNgInjectMixin) ->
 
-  class ComponentCssClassMixin extends MixinAbstract
+  class ComponentNgCssClassMixin extends MixinAbstract
 
-    @dependencies ComponentDirectiveMixin, ComponentInjectMixin
+    @dependencies ComponentNgDescriptorMixin, ComponentNgInjectMixin
 
     @cssClass: (@_cssClass) ->
 
     _cssClass: ->
 
     _preLink: ->
-      ComponentCssClassMixin.super @, '_preLink'
+      ComponentNgCssClassMixin.super @, '_preLink'
 
       element = @_getElement()
 

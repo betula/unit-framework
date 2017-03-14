@@ -1,7 +1,9 @@
 # @di
-di.provider 'ComponentExportMixin', (MixinAbstract) ->
+di.provider 'ComponentNgExportMixin', (MixinAbstract, ComponentNgInjectMixin) ->
 
-  class ComponentExportMixin extends MixinAbstract
+  class ComponentNgExportMixin extends MixinAbstract
+
+    @dependencies ComponentNgInjectMixin
 
     @export: (values...) ->
       for value in values when value?
@@ -64,3 +66,11 @@ di.provider 'ComponentExportMixin', (MixinAbstract) ->
                 set: (value) -> context[ from ] = value
             when '='
               scope[ to ] = @[ from ]
+
+
+    _exportToScope: ->
+      @_export @_getScope()
+
+    _afterInit: ->
+      ComponentNgExportMixin.super @, '_afterInit'
+      @_exportToScope()
